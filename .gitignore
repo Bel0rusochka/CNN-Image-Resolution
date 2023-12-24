@@ -1,2 +1,5 @@
 /downloads.zip
-/model/
+/image/
+/.env
+/test/
+/models/
