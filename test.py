@@ -4,8 +4,8 @@ import os, PIL
 from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
-
-model = load_model('rgb.h5')
+# os.chdir("")
+model = load_model('./models/new_model.h5')
 channels = 3
 cropped_width = 256
 cropped_height = 256
