@@ -1,95 +1,61 @@
-from keras.utils import image_dataset_from_directory
-from tensorflow.keras.applications import ResNet50
-import tensorflow as tf
-import os, keras
-from keras.layers import Conv2D, MaxPool2D, BatchNormalization, Activation, Add, Input, Conv2DTranspose, PReLU
-from keras.callbacks import EarlyStopping
+import time
+from tensorflow.keras.preprocessing.image import img_to_array, array_to_img
+from tensorflow.keras.models import load_model
+import os, PIL
+from PIL import Image
+import numpy as np
 
-current_directory = os.path.dirname(os.path.abspath(__file__))
-path = os.path.join(current_directory, 'image')
-os.chdir(path)
+
+model = load_model('./models/rgb5_256.h5')
 channels = 3
-cropped_width = 256
-cropped_height = 256
+model_width = 128
+model_height = 128
 upscale_factor = 2
-input_width = cropped_width // upscale_factor
-input_height = cropped_height // upscale_factor
 
+img_path = "./test/10.jpg"
+output_folder = "outputs"
+if not os.path.exists(output_folder):
+    os.makedirs(output_folder)
 
-def Model(channels):
-    inputs = Input(shape=(input_width, input_height, channels))
+image = PIL.Image.open(img_path)
+width, height = image.size
+if width < model_width or height < model_height:
+    print("Image is too small")
+    exit(1)
 
-    # Feature Extraction
-    model = Conv2D(112, (5, 5), padding='same', kernel_initializer='he_normal')(inputs)
-    model = PReLU()(model)
+# resize image to model size(n*256) * (m*256) where n,m - integer(coefficient)
+new_width = model_width * (width // model_width)
+new_height = model_height * (height // model_height)
+image = image.resize((new_width, new_height), PIL.Image.LANCZOS)
 
-    model = Conv2D(32, (1, 1), padding='same', kernel_initializer='he_normal')(model)
-    model = PReLU()(model)
+# dirivate image to small images 256x256
+cropped_images = []
+for i in range(0, image.size[0], model_width):
+    row_images = []
+    for j in range(0, image.size[1], model_height):
+        row_images.append(image.crop((i, j, i + model_width, j + model_height)))
+    cropped_images.append(row_images)
 
-    model = Conv2D(24, (3, 3), padding='same', kernel_initializer='he_normal')(model)
-    model = PReLU()(model)
-    recular = model
-    model = Conv2D(24, (3, 3), padding='same', kernel_initializer='he_normal')(model)
-    model = PReLU()(model)
-    model = Conv2D(24, (3, 3), padding='same', kernel_initializer='he_normal')(model)
-    model = PReLU()(model)
-    model = Conv2D(24, (3, 3), padding='same', kernel_initializer='he_normal')(model)
-    model = PReLU()(model)
-    model = Add()([model, recular])
-    model = Conv2D(112, (1, 1), padding='same', kernel_initializer='he_normal')(model)
-    model = PReLU()(model)
+# predict small images
+predicted_images = []
+for i in range(len(cropped_images)):
+    row_predicted_images = []
+    for j in range(len(cropped_images[i])):
+        img = cropped_images[i][j]
+        img = img_to_array(img)
+        img = img.astype('float32') / 255.0
+        img = np.expand_dims(img, axis=0)
+        pred = model.predict(img)
+        pred = np.squeeze(pred, axis=0)  # Remove the batch dimension
+        pred = (pred * 255).astype('uint8')  # Convert back to 8-bit integer values
+        pred = Image.fromarray(pred, 'RGB')  # Convert to Image
+        row_predicted_images.append(pred)
+    predicted_images.append(row_predicted_images)
 
+# Concatenate images
+concatenated_image = Image.new('RGB', (new_width * upscale_factor, new_height * upscale_factor))
+for i, row in enumerate(predicted_images):
+    for j, image in enumerate(row):
+        concatenated_image.paste(image, (i * 256, j * 256))
 
-    outputs = Conv2DTranspose(3, (11, 11), strides=(2, 2), padding='same', activation='sigmoid')(model)
-
-    model = keras.Model(inputs, outputs)
-    return model
-
-
-def normalize(image):
-    image = image / 255.0
-    return image
-
-
-def process_features(input, new_width, new_height):
-    return tf.image.resize(input, [new_width, new_height], method="area")
-
-
-train_set = image_dataset_from_directory(
-    path,
-    image_size=(cropped_width, cropped_height),
-    batch_size=16,
-    validation_split=0.2,
-    subset="training",
-    seed=123,
-    label_mode=None
-)
-
-validation_set = image_dataset_from_directory(
-    path,
-    image_size=(cropped_width, cropped_height),
-    batch_size=16,
-    validation_split=0.2,
-    subset="validation",
-    seed=123,
-    label_mode=None
-)
-
-train_set = train_set.map(normalize)
-validation_set = validation_set.map(normalize)
-
-train_set = train_set.map(lambda x: (process_features(x, input_width, input_height), x))
-test_set = validation_set.map(lambda x: (process_features(x, input_width, input_height), x))
-
-early_stopping = EarlyStopping(monitor='loss', patience=10, min_delta=0.0001)
-model = Model(channels)
-
-model.compile(optimizer='adam', loss='MSE')
-
-model.summary()
-model.fit(train_set, epochs=40, callbacks=[early_stopping], validation_data=test_set, verbose=1)
-
-parent_directory = os.path.dirname(os.getcwd())
-os.chdir(parent_directory)
-os.chdir('models')
-model.save('new_model.h5')
+concatenated_image.save(f"./outputs/image{time.time()}.jpg")
