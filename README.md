@@ -21,7 +21,16 @@ I downloaded a dataset of 5500 photos from the [ImagesNet](https://www.image-net
 Then I created a script that transforms all photos to the same format and checks the photos to see if they can be opened. 
 Based on the given photos, I then perform photo agmentation (from one photo I make 5 pieces including the original one), so I have used 23000 images to train the model.
 
-# Example of 
+# Results
+I have trained the model for 40 epochs and the results are shown below.
+## Origin image
+![result](src/origin.png)
+
+## Resolution 2x
+![result](src/ResolutionX2.jpg)
+
+## Resolution 4x
+![result](src/ResolutionX4.jpg)
 
 # Using libraries
 * [TensorFlow](https://www.tensorflow.org/)
