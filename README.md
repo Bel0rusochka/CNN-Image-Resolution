@@ -44,6 +44,13 @@ It is worth noting that the model was trained for 20 epochs, and the training ti
 ## Resolution 4x
 ![resultX4](src/ResolutionX4.jpg)
 
+# File
+* `src` - folder with source images
+* `main.py` - main file for using model
+* `download_image.py` - script for download images from internet 
+* `process_image.py` - script for transform images to the same format and agumentation they
+* `train_model.py` - script for training model
+
 # Confusion of my pc
  * CPU: Intel Core i7-9750HF  2.60GHz
  * GPU: NVIDIA GeForce GTX 1660 Ti
