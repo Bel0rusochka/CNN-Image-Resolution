@@ -6,13 +6,13 @@ from PIL import Image
 import numpy as np
 
 
-model = load_model('./models/rgb5_256.h5')
+model = load_model('./models/rgb1_16.h5')
 channels = 3
-model_width = 128
-model_height = 128
+model_width = 8
+model_height = 8
 upscale_factor = 2
 
-img_path = "./test/10.jpg"
+img_path = "./test/12.jpg"
 output_folder = "outputs"
 if not os.path.exists(output_folder):
     os.makedirs(output_folder)
@@ -56,6 +56,6 @@ for i in range(len(cropped_images)):
 concatenated_image = Image.new('RGB', (new_width * upscale_factor, new_height * upscale_factor))
 for i, row in enumerate(predicted_images):
     for j, image in enumerate(row):
-        concatenated_image.paste(image, (i * 256, j * 256))
+        concatenated_image.paste(image, (i * model_width * 2, j * model_height * 2))
 
 concatenated_image.save(f"./outputs/image{time.time()}.jpg")

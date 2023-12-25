@@ -52,22 +52,21 @@ def TransformDataSet():
         if width >= 800 or height >= 800:
             resized_image = image.resize((256, 256))
             resized_image.save(image_file)
-        if width < 500 or height < 300:
+        if width < 32 or height < 32:
             os.remove(image_file)
             print('Image is deleted: ', image_file)
         else:
             print('Image is ok: ', image_file)
 
 
-def AugmentImages(num_augmented_images):
-    image_files = [image_file for image_file in os.listdir() if
-                   image_file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif'))]
-
+def RenameAndAugmentImages():
+    image_files = [image_file for image_file in os.listdir()]
     for index, image_file in enumerate(image_files):
+        os.rename(dst=str(index) + '.jpg', src=image_file)
+        image_file = str(index) + '.jpg'
         img = keras.preprocessing.image.load_img(image_file)
         img_array = img_to_array(img)
-
-        for i in range(num_augmented_images):
+        for i in range(5):
             seed = int(time.time() * 1000) + i
             random.seed(seed)
 
@@ -103,13 +102,7 @@ def AugmentImages(num_augmented_images):
             augmented_img.save(output_file)
 
 
-def RenameImages():
-    image_files = [image_file for image_file in os.listdir()]
-    for i, image_file in enumerate(image_files):
-        os.rename(dst=str(i) + '.jpg', src=image_file)
-
-
-def delete_augmented_files(folder_path):
+def DeleteAugmentedFiles(folder_path):
     for file_name in os.listdir():
         if "_aug_" in file_name:
             file_path = os.path.join(folder_path, file_name)
@@ -117,6 +110,5 @@ def delete_augmented_files(folder_path):
 
 
 TransformDataSet()
-RenameImages()
-AugmentImages(5)
-# delete_augmented_files(path)
+RenameAndAugmentImages()
+# DeleteAugmentedFiles(path)

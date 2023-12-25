@@ -8,8 +8,8 @@ current_directory = os.path.dirname(os.path.abspath(__file__))
 path = os.path.join(current_directory, 'image')
 os.chdir(path)
 channels = 3
-cropped_width = 256
-cropped_height = 256
+cropped_width = 16
+cropped_height = 16
 upscale_factor = 2
 input_width = cropped_width // upscale_factor
 input_height = cropped_height // upscale_factor
@@ -19,7 +19,7 @@ def Model(channels):
     inputs = Input(shape=(input_width, input_height, channels))
 
     # Feature Extraction
-    model = Conv2D(112, (5, 5), padding='same', kernel_initializer='he_normal')(inputs)
+    model = Conv2D(112, (3, 3), padding='same', kernel_initializer='he_normal')(inputs)
     model = PReLU()(model)
 
     model = Conv2D(32, (1, 1), padding='same', kernel_initializer='he_normal')(model)
@@ -38,7 +38,7 @@ def Model(channels):
     model = Conv2D(112, (1, 1), padding='same', kernel_initializer='he_normal')(model)
     model = PReLU()(model)
 
-    outputs = Conv2DTranspose(3, (11, 11), strides=(2, 2), padding='same', activation='sigmoid')(model)
+    outputs = Conv2DTranspose(3, (5, 5), strides=(2, 2), padding='same', activation='sigmoid')(model)
 
     model = keras.Model(inputs, outputs)
     return model
@@ -56,7 +56,7 @@ def process_features(input, new_width, new_height):
 train_set = image_dataset_from_directory(
     path,
     image_size=(cropped_width, cropped_height),
-    batch_size=16,
+    batch_size=20,
     validation_split=0.2,
     subset="training",
     seed=123,
@@ -66,7 +66,7 @@ train_set = image_dataset_from_directory(
 validation_set = image_dataset_from_directory(
     path,
     image_size=(cropped_width, cropped_height),
-    batch_size=16,
+    batch_size=20,
     validation_split=0.2,
     subset="validation",
     seed=123,
