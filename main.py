@@ -1,18 +1,18 @@
+import PIL
+import os
 import time
-from tensorflow.keras.preprocessing.image import img_to_array, array_to_img
-from tensorflow.keras.models import load_model
-import os, PIL
-from PIL import Image
 import numpy as np
-
+from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing.image import img_to_array
 
 model = load_model('./models/rgb1_16.h5')
+
 channels = 3
 model_width = 8
 model_height = 8
 upscale_factor = 2
 
-img_path = "./test/12.jpg"
+img_path = "./test/13.jpg"
 output_folder = "outputs"
 if not os.path.exists(output_folder):
     os.makedirs(output_folder)
@@ -48,12 +48,12 @@ for i in range(len(cropped_images)):
         pred = model.predict(img)
         pred = np.squeeze(pred, axis=0)  # Remove the batch dimension
         pred = (pred * 255).astype('uint8')  # Convert back to 8-bit integer values
-        pred = Image.fromarray(pred, 'RGB')  # Convert to Image
+        pred = PIL.Image.fromarray(pred, 'RGB')  # Convert to Image
         row_predicted_images.append(pred)
     predicted_images.append(row_predicted_images)
 
 # Concatenate images
-concatenated_image = Image.new('RGB', (new_width * upscale_factor, new_height * upscale_factor))
+concatenated_image = PIL.Image.new('RGB', (new_width * upscale_factor, new_height * upscale_factor))
 for i, row in enumerate(predicted_images):
     for j, image in enumerate(row):
         concatenated_image.paste(image, (i * model_width * 2, j * model_height * 2))

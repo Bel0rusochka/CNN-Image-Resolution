@@ -4,6 +4,7 @@ import os, keras
 from keras.layers import Conv2D, Add, Input, Conv2DTranspose, PReLU
 from keras.callbacks import EarlyStopping
 
+
 current_directory = os.path.dirname(os.path.abspath(__file__))
 path = os.path.join(current_directory, 'image')
 os.chdir(path)
