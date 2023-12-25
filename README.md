@@ -21,16 +21,33 @@ I downloaded a dataset of 5500 photos from the [ImagesNet](https://www.image-net
 Then I created a script that transforms all photos to the same format and checks the photos to see if they can be opened. 
 Based on the given photos, I then perform photo agmentation (from one photo I make 5 pieces including the original one), so I have used 23000 images to train the model.
 
+# Algorithm of resolution image
+I want to repeat, my main goal is to double the resolution of the photo. At first my model took 128*128 pixels photos, but I was not very satisfied with the final result, because the photos were still blurred. 
+I tried different CNN architecture and also I used pre-trained models, but the result was similar. 
+So I decided that I could divide the picture into equal pieces, increase them, and then merge them all together. 
+
+The advantage of this idea was that we are not tied to the resolution of the original picture ( so we can increase a resolution of any photos), just that the image was more than this small filter. 
+As a result, I redesigned the model and now it takes a picture of 8x8 pixels to the input and outputs a picture of 16x16.
+The algorithm is that we divide the picture into 8x8 squares (if the resolution does not allow us to divide the picture into squares, we convert to a resolution that allows it), then we pass our squares to the model and merge them together and as a result we get a complete picture. 
+
+I would like to add that this algorithm is not perfect as well, because on photos now you can notice small squares on the background, and also transphomation of the picture now takes more time.
 # Results
-I have trained the model for 40 epochs and the results are shown below.
+I would like to say that the results are not perfect, but I am satisfied with them. 
+It is worth noting that the model was trained for 20 epochs, and the training time was about 20 minutes.
+
 ## Origin image
-![result](src/origin.png)
+![origin](src/origin.png)
 
 ## Resolution 2x
-![result](src/ResolutionX2.jpg)
+![resultX2](src/ResolutionX2.jpg)
 
 ## Resolution 4x
-![result](src/ResolutionX4.jpg)
+![resultX4](src/ResolutionX4.jpg)
+
+# Confusion of my pc
+ * CPU: Intel Core i7-9750HF  2.60GHz
+ * GPU: NVIDIA GeForce GTX 1660 Ti
+ * RAM: 16GB
 
 # Using libraries
 * [TensorFlow](https://www.tensorflow.org/)
