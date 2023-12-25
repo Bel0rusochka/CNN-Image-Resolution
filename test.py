@@ -15,9 +15,13 @@ input_height = cropped_height // upscale_factor
 
 test_images = sorted([os.path.join('test', img_name) for img_name in os.listdir('test')])
 
-for img_path in test_images:
+output_folder = "outputs"
+if not os.path.exists(output_folder):
+    os.makedirs(output_folder)
+
+for idx, img_path in enumerate(test_images):
     HR_image = PIL.Image.open(img_path)
-    HR_image = HR_image.resize((256, 256), PIL.Image.BICUBIC)
+    HR_image = HR_image.resize((cropped_width, cropped_height), PIL.Image.BICUBIC)
 
     LR_image = HR_image.resize((HR_image.size[0] // upscale_factor,
                                 HR_image.size[1] // upscale_factor),
@@ -33,9 +37,20 @@ for img_path in test_images:
 
     output = output[0]
     output *= 255.0
-    output = output.clip(0, 255)
-    output = PIL.Image.fromarray(np.uint8(output))
+    output = output.clip(0, cropped_height)
+    output = PIL.Image.fromarray(np.uint8(output), mode="RGB")
+
     output = output.resize(HR_image.size, PIL.Image.Resampling.NEAREST)
+
+    # Save the images
+    output_path = os.path.join(output_folder, f'result_{idx + 1}_enhanced.jpg')
+    LR_path = os.path.join(output_folder, f'result_{idx + 1}_LR.jpg')
+    HR_path = os.path.join(output_folder, f'result_{idx + 1}_HR.jpg')
+
+    output.save(output_path)
+    LR_image = LR_image.resize(HR_image.size, PIL.Image.BICUBIC)
+    LR_image.save(LR_path)
+    HR_image.save(HR_path)
 
     # Plot the images
     plt.figure(figsize=(15, 5))
