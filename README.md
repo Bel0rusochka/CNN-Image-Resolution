@@ -44,6 +44,13 @@ It is worth noting that the model was trained for 20 epochs, and the training ti
 ## Resolution 4x
 ![resultX4](src/ResolutionX4.jpg)
 
+# Launching application
+To launch the application, you need to install all the libraries, you can do this using the command:
+```pip install -r requirements.txt```
+Model is already trained, so you can use it, and model located in the src folder.
+To start the application, you need to run the main.py file, and then choose the image you want to increase the resolution of.
+The result will be saved in the output folder.
+
 # File
 * `src` - folder with source images
 * `main.py` - main file for using model
