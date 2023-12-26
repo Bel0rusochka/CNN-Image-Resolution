@@ -61,7 +61,7 @@ The result will be saved in the output folder.
 * `process_image.py` - script for transform images to the same format and agumentation they
 * `train_model.py` - script for training model
 
-# Confusion of my pc
+# Configuration of my PC
  * CPU: Intel Core i7-9750HF  2.60GHz
  * GPU: NVIDIA GeForce GTX 1660 Ti
  * RAM: 16GB
