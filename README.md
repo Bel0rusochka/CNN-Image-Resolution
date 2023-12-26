@@ -38,8 +38,11 @@ It is worth noting that the model was trained for 20 epochs, and the training ti
 ## Origin image
 ![origin](src/origin.png)
 
-## Resolution 2x
-![resultX2](src/ResolutionX2.jpg)
+## Resolution 2x CNN
+![resultX2C](src/ResolutionX2.jpg)
+
+## Resolution 2x Bicubic
+![resultX2B](src/bicubic.jpg)
 
 ## Resolution 4x
 ![resultX4](src/ResolutionX4.jpg)
